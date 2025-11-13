@@ -24,7 +24,6 @@ PADDLE_Y = ((SCREEN_HEIGHT / 2) - 50) * -1
 START_LIVES = 5
 lives = START_LIVES
 
-# TODO better brick size that will fit the screen properly
 BRICK_LEN = 2.8
 BRICK_WID = 1
 brick_w = BRICK_LEN * 20
