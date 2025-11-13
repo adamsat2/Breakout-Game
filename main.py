@@ -1,5 +1,4 @@
 import time
-import random
 from turtle import Screen
 from paddle import Paddle
 from ball import Ball
@@ -25,32 +24,45 @@ PADDLE_Y = ((SCREEN_HEIGHT / 2) - 50) * -1
 START_LIVES = 5
 lives = START_LIVES
 
-# Uniform brick size
-BRICK_LEN = 3   # width  ~ BRICK_LEN * 20 px
-BRICK_WID = 1   # height ~ BRICK_WID * 20 px
+# TODO better brick size that will fit the screen properly
+BRICK_LEN = 2.8
+BRICK_WID = 1
 brick_w = BRICK_LEN * 20
 brick_h = BRICK_WID * 20
 
-# Keep bricks fully on-screen
-start_x = -SCREEN_WIDTH // 2 + brick_w // 2
-end_x = SCREEN_WIDTH // 2 - brick_w // 2
-start_y = 300 - brick_h // 2
-end_y = 100 + brick_h // 2
+NUM_BRICKS_PER_ROW = 13
+GAP_X = 4
+GAP_Y = 4
 
-colors = ["red", "orange", "yellow", "green", "cyan", "magenta", "purple", "blue"]
+start_y = 275
+end_y = 150
+
+colors = ["brown", "red", "orange", "yellow", "green", "blue"]
 target_paddles = []
 
 
 def place_target_paddles():
+    # (13 bricks * 56px) + (12 gaps * 4px) = 776px
+    total_grid_width = (NUM_BRICKS_PER_ROW * brick_w) + ((NUM_BRICKS_PER_ROW - 1) * GAP_X)
+
+    start_x = -total_grid_width // 2 + brick_w // 2 - 3
+
     y = start_y
+    color_index = 0
+
     while y >= end_y:
+        row_color = colors[color_index % len(colors)]
         x = start_x
-        while x <= end_x:
-            p = Paddle((x, y), random.choice(colors))
+
+        for i in range(NUM_BRICKS_PER_ROW):
+            p = Paddle((x, y), row_color)
             p.shapesize(stretch_wid=BRICK_WID, stretch_len=BRICK_LEN)
             target_paddles.append(p)
-            x += brick_w
-        y -= brick_h
+
+            x += (brick_w + GAP_X)
+
+        y -= (brick_h + GAP_Y)
+        color_index += 1
 
 
 def clear_target_paddles():
@@ -67,7 +79,9 @@ scoreboard = Scoreboard(lives)
 
 screen.listen()
 screen.onkeypress(paddle.go_right, "d")
+screen.onkeypress(paddle.go_right, "Right")
 screen.onkeypress(paddle.go_left, "a")
+screen.onkeypress(paddle.go_left, "Left")
 
 while game_is_on:
     time.sleep(0.05)
@@ -86,7 +100,8 @@ while game_is_on:
     # Collision with target paddles
     # tar_paddle runs on a copy of target_paddles to not miss any target paddle if we remove one
     for tar_paddle in target_paddles[:]:
-        if ball.distance(tar_paddle) < 30:
+        # Only remove a brick if the ball hits it from below (like in the original game)
+        if ball.distance(tar_paddle) < 30 and ball.y_move > 0:
             ball.bounce_y()
             tar_paddle.hideturtle()
             tar_paddle.clear()
@@ -98,6 +113,8 @@ while game_is_on:
         ball.bounce_x()
 
     # Collision with top wall or with player paddle
+    # TODO add a small acceleration boost when ball has collision with player paddle
+    #  and reset it when a player loses a life
     if ball.ycor() > BALL_Y_WALL or (ball.ycor() < (PADDLE_Y + 30) and ball.distance(paddle) < 50):
         ball.bounce_y()
 
