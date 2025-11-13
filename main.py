@@ -112,8 +112,6 @@ while game_is_on:
         ball.bounce_x()
 
     # Collision with top wall or with player paddle
-    # TODO add a small acceleration boost when ball has collision with player paddle
-    #  and reset it when a player loses a life
     if ball.ycor() > BALL_Y_WALL or (ball.ycor() < (PADDLE_Y + 30) and ball.distance(paddle) < 50):
         ball.bounce_y()
 
