@@ -44,7 +44,7 @@ def place_target_paddles():
     # (13 bricks * 56px) + (12 gaps * 4px) = 776px
     total_grid_width = (NUM_BRICKS_PER_ROW * brick_w) + ((NUM_BRICKS_PER_ROW - 1) * GAP_X)
 
-    start_x = -total_grid_width // 2 + brick_w // 2 - 3
+    start_x = -total_grid_width // 2 + brick_w // 2 - 4
 
     y = start_y
     color_index = 0
